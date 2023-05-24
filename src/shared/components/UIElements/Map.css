@@ -1,0 +1,7 @@
+.map {
+    height: 100%;
+    width: 100%;    
+    border-style: solid;
+    border-width: 2px;
+    border-color:rgb(156, 167, 230); 
+}
