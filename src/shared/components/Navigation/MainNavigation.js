@@ -5,6 +5,7 @@ import MainHeader from './MainHeader';
 import NavLinks from './NavLinks';
 import SideDrawer from './SideDrawer';
 import Backdrop from '../UIElements/Backdrop';
+
 import './MainNavigation.css';
 
 const MainNavigation = props => {
@@ -44,7 +45,7 @@ const MainNavigation = props => {
           <NavLinks />
         </nav>
       </MainHeader>
-      
+
     </React.Fragment>
   );
 };
