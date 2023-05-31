@@ -45,7 +45,6 @@ const Auth = () => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        console.log(formState.inputs);
         auth.login();
     };
 
