@@ -1,5 +1,6 @@
 import React, {useState, useContext} from "react";
 import { useForm } from "../../shared/components/hooks/form-hook";
+import { useHttpClient } from "../../shared/components/hooks/http-hook";
 
 import Input from "../../shared/components/FormElements/Input";
 import Card from "../../shared/components/UIElements/Card";
@@ -36,71 +37,55 @@ const Auth = () => {
 
     const [isLoginMode, setIsLoginMode] = useState(true);
     const [initalFormState, setInitalFormState] = useState(initialLoginState)
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState();
 
     const [formState, inputHandler] = useForm(initalFormState, false);
+
+    const { isLoading, error, sendRequest, clearError } = useHttpClient();
 
     const auth = useContext(AuthContext);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        setIsLoading(true);
-
         if(isLoginMode) {
-            try{
-                const response =  await fetch("http://localhost:5000/api/users/login", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
+            try {
+                const responseData = await sendRequest(
+                    "http://localhost:5000/api/users/login",
+                    "POST",
+                    JSON.stringify({
                         email: formState.inputs.email.value,
                         password: formState.inputs.password.value
-                    })
-                });
-                const responseData = await response.json();
-                console.log(responseData);
-                if(!response.ok) {
-                    throw new Error(responseData.message);
-                }
-                setIsLoading(false);
-                auth.login();
+                    }),
+                    {
+                        "Content-Type": "application/json"
+                    }
+                )
+                auth.login(responseData.user.id);
             }
             catch(err) {
                 console.log(err);
-                setIsLoading(false);
-                setError(err.message || "Something went wrong, please try again.");
             }
         }
         else {
-            try{
-                const response = await fetch("http://localhost:5000/api/users/signup", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
+            try {
+                const responseData = sendRequest(
+                    "http://localhost:5000/api/users/signup",
+                    "POST",
+                    JSON.stringify({
                         name: formState.inputs.name.value,
                         email: formState.inputs.email.value,
                         password: formState.inputs.password.value
-                    })
-                });
-                const responseData = await response.json();
-                console.log(responseData);
-                if(!response.ok) {
-                    throw new Error(responseData.message);
-                }
-                setIsLoading(false);
-                auth.login();
+                    }),
+                    {
+                        "Content-Type": "application/json"
+                    }
+                )
+                auth.login(responseData.userId);
             }
             catch(err) {
                 console.log(err);
-                setIsLoading(false);
-                setError(err.message || "Something went wrong, please try again.");
             }
-        }
+        }    
     };
 
     const switchModeHandler = () => {
@@ -111,7 +96,7 @@ const Auth = () => {
 
     return(
         <React.Fragment>
-            <ErrorModal error={error} onClear={() => setError(null)}/>
+            <ErrorModal error={error} onClear={clearError}/>
             <Card className="authentication">
                 {isLoading && <LoadingSpinner asOverlay/>}
                 <h2 className="authentication__header">{isLoginMode ? "Login Required" : "Sign In"}</h2>

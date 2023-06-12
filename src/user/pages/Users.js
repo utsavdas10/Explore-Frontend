@@ -1,42 +1,37 @@
-import React from 'react';
-import UserList from '../components/UserList';
+import React, { useEffect, useState } from 'react';
+
+import UsersList from '../components/UserList';
+import ErrorModal from '../../shared/components/UIElements/ErrorModal';
+import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner';
+import { useHttpClient } from '../../shared/components/hooks/http-hook';
 
 const Users = () => {
-    const USERS = [
-      {
-        id: 'u1', 
-        name: 'Utsav Das',
-        image: 'https://cdn.dribbble.com/users/1684249/screenshots/15431837/media/b8793da764afaf229379b316181bf8eb.gif',
-        places: 3
-      },
-      {
-        id: 'u2', 
-        name: 'Deya Hazra',
-        image: 'https://cdn.dribbble.com/userupload/6493616/file/original-ea422834716af81b0c6a90646a818dd1.jpg?compress=1&resize=450x338&vertical=top',
-        places: 4
-      },
-      {
-        id: 'u3', 
-        name: 'Raya Hazra',
-        image: 'https://cdn.dribbble.com/userupload/4998211/file/original-557dd8fbf8ad6ca90c48675f4535ddcd.png?compress=1&resize=450x338&vertical=top',
-        places: 1
-      },
-      {
-        id: 'u4', 
-        name: 'Subir Das',
-        image: 'https://cdn.dribbble.com/users/35810/screenshots/5478946/danny-knights-01thumb.jpg?compress=1&resize=450x338&vertical=top',
-        places: 2
-      },
-      {
-        id: 'u5', 
-        name: 'Raju Da',
-        image: 'https://cdn.dribbble.com/userupload/3223268/file/still-aaa3d79fff603264f244ba79e34864fd.png?compress=1&resize=450x338&vertical=top',
-        places: 4
-      }
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
+  const [loadedUsers, setLoadedUsers] = useState();
 
-    ];
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const responseData = await sendRequest(
+          'http://localhost:5000/api/users'
+        );
+        setLoadedUsers(responseData.users);
+      } catch (err) {}
+    };
+    fetchUsers();
+  }, [sendRequest]);
 
-  return <UserList items={USERS}/>;
+  return (
+    <React.Fragment>
+      <ErrorModal error={error} onClear={clearError} />
+      {isLoading && (
+        <div className="center">
+          <LoadingSpinner />
+        </div>
+      )}
+      {!isLoading && loadedUsers && <UsersList items={loadedUsers} />}
+    </React.Fragment>
+  );
 };
 
 export default Users;

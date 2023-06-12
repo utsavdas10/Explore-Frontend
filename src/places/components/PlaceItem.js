@@ -1,17 +1,26 @@
 import React, {useState, useContext} from "react";
 
+import { useHistory } from "react-router-dom"
+
 import Card from "../../shared/components/UIElements/Card";
 import Button from "../../shared/components/FormElements/Button";
 import Modal from "../../shared/components/UIElements/Modal";
 import Map from "../../shared/components/UIElements/Map";
+import ErrorModal from "../../shared/components/UIElements/ErrorModal";
+import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
 
 import { AuthContext } from "../../shared/context/auth-context";
+
+import { useHttpClient } from "../../shared/components/hooks/http-hook";
+
 
 import "./PlaceItem.css";
 
 const PlaceItem = props => {
-
     const auth = useContext(AuthContext);
+    const history = useHistory();
+
+    const { isLoading, error, sendRequest, clearError } = useHttpClient();
     
     const [showMap, setShowMap] = useState(false);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -24,9 +33,16 @@ const PlaceItem = props => {
 
     const closeConfirmHandler = () => setShowConfirmModal(false);
 
-    const confirmDeleteHandler = () => {
-        console.log("DELETING...");
-        setShowConfirmModal(false);
+    const confirmDeleteHandler = async () => {
+        try {
+            await sendRequest(
+                `http://localhost:5000/api/places/${props.id}`,
+                "DELETE"
+            );
+            setShowConfirmModal(false);
+            props.onDelete(props.id);
+            history.push(`/${auth.userId}/places`);
+        } catch (err) {}
     }
 
 
@@ -56,10 +72,13 @@ const PlaceItem = props => {
                 onCancel={closeConfirmHandler}
                 header="Are you sure?"
                 footerClass="place-item__modal-actions"
-                footer={footerElement}>
+                footer={footerElement}
+            >
+                {isLoading && <LoadingSpinner asOverlay />}
                 <p>Do you want to proceed and delete this place? Please note that it can't be undone thereafter.</p>
             </Modal>
 
+            <ErrorModal error={error} onClear={clearError} />
 
             <li className="place-item">
                 <Card className="place-item__content">
@@ -73,7 +92,7 @@ const PlaceItem = props => {
                     </div>
                     <div className="place-item__actions">
                         <Button inverse onClick={openMapHandler}>View on Map</Button>
-                        {auth.isLoggedIn &&
+                        {auth.isLoggedIn && auth.userId === props.creatorId &&
                             <React.Fragment>
                                 <Button to={`/places/${props.id}`}>Edit</Button>
                                 <Button danger onClick={openConfirmHandler} >Delete</Button>
