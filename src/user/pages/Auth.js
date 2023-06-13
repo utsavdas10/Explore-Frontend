@@ -3,6 +3,7 @@ import { useForm } from "../../shared/components/hooks/form-hook";
 import { useHttpClient } from "../../shared/components/hooks/http-hook";
 
 import Input from "../../shared/components/FormElements/Input";
+import ImageUpload from "../../shared/components/FormElements/ImageUpload";
 import Card from "../../shared/components/UIElements/Card";
 import Button from "../../shared/components/FormElements/Button";
 import ErrorModal from "../../shared/components/UIElements/ErrorModal";
@@ -32,6 +33,10 @@ const Auth = () => {
             value: "",
             isValid: false
         },
+        image: {
+            value: null,
+            isValid: false
+        },
         ...initialLoginState
     };
 
@@ -46,7 +51,7 @@ const Auth = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-
+        console.log(formState.inputs);
         if(isLoginMode) {
             try {
                 const responseData = await sendRequest(
@@ -131,6 +136,14 @@ const Auth = () => {
                         errorText="Please enter a valid password, at least 6 characters."
                         onInput={inputHandler}
                     />
+                {!isLoginMode && 
+                    <ImageUpload 
+                        center
+                        label="Profile Image"
+                        id="image" 
+                        onInput={inputHandler} 
+                        errorText="Please provide an image."
+                    />}
 
                     <Button inverse 
                         type="submit" 

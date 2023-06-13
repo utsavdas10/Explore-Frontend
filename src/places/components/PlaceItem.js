@@ -1,7 +1,5 @@
 import React, {useState, useContext} from "react";
 
-import { useHistory } from "react-router-dom"
-
 import Card from "../../shared/components/UIElements/Card";
 import Button from "../../shared/components/FormElements/Button";
 import Modal from "../../shared/components/UIElements/Modal";
@@ -18,7 +16,6 @@ import "./PlaceItem.css";
 
 const PlaceItem = props => {
     const auth = useContext(AuthContext);
-    const history = useHistory();
 
     const { isLoading, error, sendRequest, clearError } = useHttpClient();
     
@@ -41,7 +38,6 @@ const PlaceItem = props => {
             );
             setShowConfirmModal(false);
             props.onDelete(props.id);
-            history.push(`/${auth.userId}/places`);
         } catch (err) {}
     }
 
