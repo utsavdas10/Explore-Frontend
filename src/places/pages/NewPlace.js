@@ -1,6 +1,7 @@
 import React from 'react';
 
 import Input from '../../shared/components/FormElements/Input';
+import ImageUpload from '../../shared/components/FormElements/ImageUpload';
 import Button from '../../shared/components/FormElements/Button';
 import {
   VALIDATOR_REQUIRE,
@@ -44,20 +45,18 @@ const NewPlace = () => {
 
   const placeSubmitHandler = async event => {
     event.preventDefault();
-    console.log(formState.inputs); // send this to the backend!
     try{
+      const formData = new FormData();
+      formData.append('title', formState.inputs.title.value);
+      formData.append('description', formState.inputs.description.value);
+      formData.append('address', formState.inputs.address.value);
+      formData.append('creator', auth.userId);
+      formData.append('image', formState.inputs.image.value);
+      console.log(formData);
       const responseData = await sendRequest(
         'http://localhost:5000/api/places',
         'POST',
-        JSON.stringify({
-          title: formState.inputs.title.value,
-          description: formState.inputs.description.value,
-          address: formState.inputs.address.value,
-          creator: auth.userId
-        }),
-        {
-          'Content-Type': 'application/json'
-        }
+        formData
       );
       history.push('/');
       console.log(responseData);
@@ -96,7 +95,13 @@ const NewPlace = () => {
           errorText="Please enter a valid address."
           onInput={inputHandler}
         />
-        <Button type="submit" disabled={!formState.isValid}>
+        <ImageUpload
+          id="image" 
+          label="Place Image"
+          onInput={inputHandler} 
+          errorText="Please provide an image."
+        />
+        <Button inverse type="submit" disabled={!formState.isValid}>
           ADD PLACE
         </Button>
       </form>
