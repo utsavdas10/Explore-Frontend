@@ -6,6 +6,7 @@
     "@headlessui/react": "^1.7.14",
     "@heroicons/react": "^2.0.18",
     "bcryptjs": "^2.4.3",
+    "dotenv": "^16.2.0",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
     "react-router-dom": "5.3.4",
